@@ -1,112 +1,72 @@
 package com.example.demo;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Function;
-
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.SerializerProvider;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
 
 @RestController
 public class GreetingController {
 
-    private static final String template = "Hello, %s!";
-    private final AtomicLong counter = new AtomicLong();
+    /**
+     * Response class that matches the specified JSON format
+     */
+    public static class SearchResponse {
+        private String operation;
+        private String inputlist;
+        private String value;
+        private String output;
 
-    @GetMapping("/greeting")
-    public Greeting greeting(@RequestParam(value = "name", defaultValue = "World") String name) {
-        System.out.println("Linear " + linearSearch.linearSearching(List.of(10,20,13,40,60), 40));
-        System.out.println("Binary " + binarySearch.binarySearching(List.of(10,13,20,40,60), 13, 0));
-        return new Greeting(counter.incrementAndGet(), String.format(template, name));
+        public SearchResponse(String operation, List<Integer> list, Integer value, String output) {
+            this.operation = operation;
+            this.inputlist = list.toString().replace("[", "").replace("]", "").replace(" ", "");
+            this.value = value.toString();
+            this.output = output;
+        }
+
+        // Getters y setters requeridos por Spring para la serialización JSON
+        public String getOperation() { return operation; }
+        public void setOperation(String operation) { this.operation = operation; }
+        public String getInputlist() { return inputlist; }
+        public void setInputlist(String inputlist) { this.inputlist = inputlist; }
+        public String getValue() { return value; }
+        public void setValue(String value) { this.value = value; }
+        public String getOutput() { return output; }
+        public void setOutput(String output) { this.output = output; }
     }
 
     @GetMapping("/linearsearch")
-    public String linearSearch(@RequestParam(value = "list") List<Integer>  list, @RequestParam(value = "value") Integer number){
-        String result = linearSearch.linearSearching(list, number);
+    public ResponseEntity<SearchResponse> linearSearch(
+            @RequestParam("list") List<Integer> list,
+            @RequestParam("value") Integer number) {
 
-        return "<!DOCTYPE Document/JSON>\n" +
-                "{\n" +
-                " \"operation\": \"binarySearch\",\n" +
-                " \"inputlist\":" +"\"" + list + "\",\n\"" +
-                " \"value\":" +"\"" + number + "\",\n\"" +
-                " \"output\":" +"\"" + result + "\",\n\"" +
-                "}";
+        int resultIndex = linearSearch.search(list, number);
+
+        SearchResponse response = new SearchResponse(
+                "linearSearch",
+                list,
+                number,
+                String.valueOf(resultIndex)
+        );
+
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/binarysearch")
-    public void binarySearch(@RequestParam(value = "list") List<Integer>  list, @RequestParam(value = "value") Integer number, JsonGenerator jgen){
+    public ResponseEntity<SearchResponse> binarySearch(
+            @RequestParam("list") List<Integer> list,
+            @RequestParam("value") Integer number) {
 
-        String result = binarySearch.binarySearching(list, number,0);
+        int resultIndex = BinarySearch.search(list, number);
 
+        SearchResponse response = new SearchResponse(
+                "binarySearch",
+                list,
+                number,
+                String.valueOf(resultIndex)
+        );
 
-        jgen.writeStringField("operation", "binarySearch"),
-        jgen.writeNumberField("inputlist", list);
-
-
-
-    }
-
-    @Override
-    protected void serializeObject(JsonGenerator jgen, SerializerProvider provider)
-            throws IOException {
-
-    }
-
-    @GetMapping("/")
-    public String index(){
-        return "<!DOCTYPE html>\n" +
-                "<html>\n" +
-                "<head>\n" +
-                "    <title>Form Example</title>\n" +
-                "    <meta charset=\"UTF-8\">\n" +
-                "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n" +
-                "</head>\n" +
-                "<body>\n" +
-                "<h1>Form with GET</h1>\n" +
-                "<form action=\"/greeting\">\n" +
-                "    <label for=\"name\">Name:</label><br>\n" +
-                "    <input type=\"text\" id=\"name\" name=\"name\" value=\"John\"><br><br>\n" +
-                "    <input type=\"button\" value=\"Submit\" onclick=\"loadGetMsg()\">\n" +
-                "</form>\n" +
-                "<div id=\"getrespmsg\"></div>\n" +
-                "\n" +
-                "<script>\n" +
-                "    function loadGetMsg() {\n" +
-                "        let nameVar = document.getElementById(\"name\").value;\n" +
-                "        const xhttp = new XMLHttpRequest();\n" +
-                "        xhttp.onload = function() {\n" +
-                "            document.getElementById(\"getrespmsg\").innerHTML =\n" +
-                "            this.responseText;\n" +
-                "        }\n" +
-                "        xhttp.open(\"GET\", \"/binarysearch?list=10,20,13,40,60&value=13;\n" +
-                "        xhttp.send();\n" +
-                "    }\n" +
-                "</script>\n" +
-                "\n" +
-                "<h1>Form with POST</h1>\n" +
-                "<form action=\"/hellopost\">\n" +
-                "    <label for=\"postname\">Name:</label><br>\n" +
-                "    <input type=\"text\" id=\"postname\" name=\"name\" value=\"John\"><br><br>\n" +
-                "    <input type=\"button\" value=\"Submit\" onclick=\"loadPostMsg(postname)\">\n" +
-                "</form>\n" +
-                "\n" +
-                "<div id=\"postrespmsg\"></div>\n" +
-                "\n" +
-                "<script>\n" +
-                "    function loadPostMsg(name){\n" +
-                "        let url = \"/hellopost?name=\" + name.value;\n" +
-                "\n" +
-                "        fetch (url, {method: 'POST'})\n" +
-                "            .then(x => x.text())\n" +
-                "            .then(y => document.getElementById(\"postrespmsg\").innerHTML = y);\n" +
-                "    }\n" +
-                "</script>\n" +
-                "</body>\n" +
-                "</html>";
+        return ResponseEntity.ok(response);
     }
 }
