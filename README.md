@@ -13,4 +13,20 @@ Se llego a implementar de forma sencilla las dos busquedas:
 
 Vemos que se pudieron implementar los EndPoints para que el backend haga las intrucciones de busqueda
 
+Ademas se pudo implementar el roundrobin a espera del link correspondiente a los dos EC2
+
+![image](https://github.com/user-attachments/assets/ecba46fd-4d98-42da-8382-5b6f061ca2c5)
+
+
+## Que nos falta?
+
+El siguiente paso seria crear las dos EC2 donde se instalen ambos microservicios de math, para luego añadir los links de dichos EC2 al roundRobin y montarlo en una tercera maquina EC2 junto a un front que haga las solicutides de manera distribuida a ambos microservicios ya montados
+
 ## Arquitectura deseada
+
+La arquitectura seria la siguiente:
+
+![image](https://github.com/user-attachments/assets/e78334a1-1e3a-4e7d-b376-97d243bab1ec)
+
+Donde el roundRobin actua como un balanceo de cargas entre los dos microservicios
+
