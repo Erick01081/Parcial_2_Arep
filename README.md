@@ -20,7 +20,11 @@ Ademas se pudo implementar el roundrobin a espera del link correspondiente a los
 
 ## Que nos falta?
 
-El siguiente paso seria crear las dos EC2 donde se instalen ambos microservicios de math, para luego añadir los links de dichos EC2 al roundRobin y montarlo en una tercera maquina EC2 junto a un front que haga las solicutides de manera distribuida a ambos microservicios ya montados
+El siguiente paso seria adaptar el front para que pueda leer JSon y ademas adaptar el back para que envie los JSon en forma correcta
+
+Luego de ello el siguiente paso seria crear las dos EC2 donde se instalen ambos microservicios de math, para luego añadir los links de dichos EC2 al roundRobin y montarlo en una tercera maquina EC2 junto a un front que haga las solicutides de manera distribuida a ambos microservicios ya montados
+
+Como ultimo paso seria configurar para que la conexion entre todas las EC2 se de correctamente
 
 ## Arquitectura deseada
 
